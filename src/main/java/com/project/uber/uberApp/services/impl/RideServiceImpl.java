@@ -1,11 +1,12 @@
 package com.project.uber.uberApp.services.impl;
 
-import com.project.uber.uberApp.dto.RideRequestDto;
 import com.project.uber.uberApp.enitities.Driver;
 import com.project.uber.uberApp.enitities.Ride;
 import com.project.uber.uberApp.enitities.RideRequest;
+import com.project.uber.uberApp.enitities.Rider;
 import com.project.uber.uberApp.enitities.enums.RideRequestStatus;
 import com.project.uber.uberApp.enitities.enums.RideStatus;
+import com.project.uber.uberApp.exceptions.ResourceNotFoundException;
 import com.project.uber.uberApp.repositories.RideRepository;
 import com.project.uber.uberApp.services.RideRequestService;
 import com.project.uber.uberApp.services.RideService;
@@ -27,12 +28,8 @@ public class RideServiceImpl implements RideService {
 
     @Override
     public Ride getRideById(Long rideId) {
-        return null;
-    }
-
-    @Override
-    public void matchWithDrivers(RideRequestDto rideRequestDto) {
-
+        return rideRepository.findById(rideId)
+                .orElseThrow(() -> new ResourceNotFoundException("Ride is not found by Id: "+ rideId));
     }
 
     @Override
@@ -50,18 +47,19 @@ public class RideServiceImpl implements RideService {
     }
 
     @Override
-    public Ride updateRideStatus(Long rideId, RideStatus rideStatus) {
-        return null;
+    public Ride updateRideStatus(Ride ride, RideStatus rideStatus) {
+        ride.setRideStatus(rideStatus);
+        return rideRepository.save(ride);
     }
 
     @Override
-    public Page<Ride> getAllRidesOfRider(Long riderId, PageRequest pageRequest) {
-        return null;
+    public Page<Ride> getAllRidesOfRider(Rider rider, PageRequest pageRequest) {
+        return rideRepository.findByRider(rider, pageRequest);
     }
 
     @Override
-    public Page<Ride> getAllRidesOfDriver(Long driverId, PageRequest pageRequest) {
-        return null;
+    public Page<Ride> getAllRidesOfDriver(Driver driver, PageRequest pageRequest) {
+        return rideRepository.findByDriver(driver, pageRequest);
     }
 
 
