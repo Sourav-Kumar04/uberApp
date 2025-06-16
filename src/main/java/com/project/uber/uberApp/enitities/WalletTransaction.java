@@ -3,12 +3,18 @@ package com.project.uber.uberApp.enitities;
 import com.project.uber.uberApp.enitities.enums.TransactionMethod;
 import com.project.uber.uberApp.enitities.enums.TransactionType;
 import jakarta.persistence.*;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
 @Entity
-public class WalletTransactions {
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+@Builder
+public class WalletTransaction {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

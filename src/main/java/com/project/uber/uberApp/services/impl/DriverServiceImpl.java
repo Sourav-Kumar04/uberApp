@@ -11,6 +11,7 @@ import com.project.uber.uberApp.enitities.enums.RideStatus;
 import com.project.uber.uberApp.exceptions.ResourceNotFoundException;
 import com.project.uber.uberApp.repositories.DriverRepository;
 import com.project.uber.uberApp.services.DriverService;
+import com.project.uber.uberApp.services.PaymentService;
 import com.project.uber.uberApp.services.RideRequestService;
 import com.project.uber.uberApp.services.RideService;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +31,7 @@ public class DriverServiceImpl implements DriverService {
     private final DriverRepository driverRepository;
     private final RideService rideService;
     private final ModelMapper modelMapper;
+    private final PaymentService paymentService;
 
     @Override
     @Transactional
@@ -88,7 +90,7 @@ public class DriverServiceImpl implements DriverService {
             throw new RuntimeException("Driver cannot start the ride as some other driver has accepted the ride");
         }
 
-        //driver can only start a ride if hte ride si confirmed
+        //driver can only start a ride if the ride is confirmed
         if(!ride.getRideStatus().equals(RideStatus.CONFIRMED)){
             throw new RuntimeException("Ride status is not yet Confirmed");
         }
@@ -101,12 +103,36 @@ public class DriverServiceImpl implements DriverService {
         ride.setStartedAt(LocalDateTime.now());
         Ride savedRide = rideService.updateRideStatus(ride, RideStatus.ONGOING);
 
+        //for handling payment create payment object
+        paymentService.createNewPayment(savedRide);
+
         return modelMapper.map(savedRide,RideDto.class);
     }
 
     @Override
+    @Transactional
     public RideDto endRide(Long rideId) {
-        return null;
+        Ride ride = rideService.getRideById(rideId);
+
+        //check if the driver owns the Ride or not
+        Driver driver = getCurrentDriver();
+
+        if(!driver.equals(ride.getDriver())){
+            throw new RuntimeException("Driver cannot start the ride as some other driver has accepted the ride");
+        }
+
+        //driver can only start a ride if the ride si confirmed
+        if(!ride.getRideStatus().equals(RideStatus.ONGOING)){
+            throw new RuntimeException("Ride status is not ONGOING, hence cannot be ended, ride status" + ride.getRideStatus());
+        }
+
+        ride.setEndedAt(LocalDateTime.now());
+        Ride savedRide = rideService.updateRideStatus(ride,RideStatus.ENDED);
+        updateDriverAvailability(driver,true);
+
+        paymentService.processPayment(ride);
+
+        return modelMapper.map(savedRide, RideDto.class);
     }
 
     @Override

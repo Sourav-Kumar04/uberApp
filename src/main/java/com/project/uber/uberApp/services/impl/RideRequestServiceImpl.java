@@ -1,14 +1,15 @@
-package com.project.uber.uberApp.services;
+package com.project.uber.uberApp.services.impl;
 
 import com.project.uber.uberApp.enitities.RideRequest;
 import com.project.uber.uberApp.exceptions.ResourceNotFoundException;
 import com.project.uber.uberApp.repositories.RideRequestRepository;
+import com.project.uber.uberApp.services.RideRequestService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class RideRequestServiceImpl implements RideRequestService{
+public class RideRequestServiceImpl implements RideRequestService {
     //we are not using rideRequestRepository directly because :
     //1.Encapsulation
     //2.Loose Coupling
