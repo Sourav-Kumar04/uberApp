@@ -27,4 +27,6 @@ public interface DriverService {
     Driver getCurrentDriver();
 
     Driver updateDriverAvailability(Driver driver, boolean availability);
+
+    Driver createNewDriver(Driver driver);
 }

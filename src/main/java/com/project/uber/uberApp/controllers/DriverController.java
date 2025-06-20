@@ -1,15 +1,19 @@
 package com.project.uber.uberApp.controllers;
 
-import com.project.uber.uberApp.dto.RideDto;
-import com.project.uber.uberApp.dto.RideStartDto;
+import com.project.uber.uberApp.dto.*;
 import com.project.uber.uberApp.services.DriverService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/drivers")
+@Secured("ROLE_DRIVER")
 public class DriverController {
 
     private final DriverService driverService;
@@ -29,4 +33,40 @@ public class DriverController {
         return ResponseEntity.ok(driverService.endRide(rideId));
     }
 
+    @PostMapping("/cancelRide/{rideId}")
+    public ResponseEntity<RideDto> cancelRide(@PathVariable Long rideId){
+        return ResponseEntity.ok(driverService.cancelRide(rideId));
+    }
+
+    @PostMapping("/rateRider")
+    public ResponseEntity<RiderDto> rateRider(@RequestBody RatingDto ratingDto){
+        return ResponseEntity.ok(driverService.rateRider(ratingDto.getRideId(),ratingDto.getRating()));
+    }
+
+    @GetMapping("/getMyProfile")
+    public ResponseEntity<DriverDto> getMyProfile(){
+        return ResponseEntity.ok(driverService.getMyProfile());
+    }
+
+    @GetMapping("/getAllMyRides")
+    public ResponseEntity<Page<RideDto>> getAllMyRides(@RequestParam(defaultValue = "0") Integer pageOffSet,
+                                                       @RequestParam(defaultValue = "10", required = false) Integer pageSize){
+        PageRequest pageRequest = PageRequest.of(pageOffSet, pageSize, Sort.by(Sort.Direction.DESC,"createdTime","id"));
+        return ResponseEntity.ok(driverService.getMyAllRides(pageRequest));
+    }
+
+//    @PostMapping("/rateRider/{rideId}/{rating}")
+//    public ResponseEntity<RiderDto> rateRider(@PathVariable Long rideId, @PathVariable Integer rating){
+//        return ResponseEntity.ok(driverService.rateRider(rideId,rating));
+//    }
 }
+
+
+
+
+
+
+
+
+
+

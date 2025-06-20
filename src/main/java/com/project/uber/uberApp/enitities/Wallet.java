@@ -19,7 +19,7 @@ public class Wallet {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @OneToOne(fetch = FetchType.LAZY, optional = false, cascade = CascadeType.DETACH)
     private User user;
 
     @OneToMany(mappedBy = "wallet" , fetch = FetchType.LAZY)
